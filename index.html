@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jadwal Kuliah — Pendidikan Bahasa Arab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#F6F1E7;
+    --ink:#20211B;
+    --pine:#1E3A34;
+    --pine-soft:#274943;
+    --gold:#B8894F;
+    --gold-soft:#EFE2C8;
+    --rust:#A6543C;
+    --rust-soft:#F1DCD4;
+    --slate:#55677A;
+    --slate-soft:#DCE2E8;
+    --pine-soft-bg:#DCE6E3;
+    --line:#DDD3BF;
+    --card-white:#FFFDF8;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:'Karla', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{
+    max-width:1000px;
+    margin:0 auto;
+    padding:30px 18px 56px;
+  }
+
+  header{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:18px;
+    padding-bottom:20px;
+    border-bottom:2px solid var(--pine);
+    margin-bottom:22px;
+  }
+
+  .title-block h1{
+    font-family:'Lora', serif;
+    font-weight:700;
+    font-size:clamp(24px, 4vw, 34px);
+    line-height:1.15;
+    margin:0 0 6px;
+    color:var(--pine);
+  }
+
+  .title-block p{
+    margin:0;
+    font-size:14px;
+    color:#5b5847;
+  }
+
+  .stat-row{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+
+  .stat{ text-align:right; }
+
+  .stat .num{
+    font-family:'Lora', serif;
+    font-weight:700;
+    font-size:22px;
+    color:var(--pine);
+    display:block;
+  }
+
+  .stat .lbl{
+    font-size:11.5px;
+    color:#7a7663;
+  }
+
+  .legend{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    font-size:13px;
+    color:#4b483a;
+  }
+
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .swatch{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+
+  /* ---- Timetable ---- */
+  .table-scroll{
+    overflow-x:auto;
+    border-radius:14px;
+    border:1px solid var(--line);
+  }
+
+  table.timetable{
+    width:100%;
+    min-width:760px;
+    border-collapse:collapse;
+    background:var(--card-white);
+  }
+
+  table.timetable th{
+    background:var(--pine);
+    color:#F3EEE2;
+    font-family:'Lora', serif;
+    font-weight:600;
+    font-size:14.5px;
+    padding:13px 10px;
+    text-align:center;
+  }
+
+  table.timetable th:first-child{
+    width:92px;
+  }
+
+  table.timetable td{
+    border-top:1px solid var(--line);
+    border-left:1px solid var(--line);
+    padding:8px;
+    vertical-align:top;
+    text-align:center;
+  }
+
+  table.timetable td:first-child{
+    background:var(--parchment);
+    font-weight:600;
+    font-size:13px;
+    color:#6b6754;
+    white-space:nowrap;
+    text-align:right;
+    padding-right:12px;
+  }
+
+  .slot{
+    border-radius:9px;
+    padding:9px 8px;
+    color:#fff;
+    text-align:left;
+    line-height:1.35;
+  }
+
+  .slot .mk{
+    font-weight:700;
+    font-family:'Lora', serif;
+    font-size:13.5px;
+    display:block;
+    margin-bottom:2px;
+  }
+
+  .slot .meta{
+    font-size:11.5px;
+    opacity:.92;
+    display:block;
+  }
+
+  .cat-inti{ background:var(--pine); }
+  .cat-pembelajaran{ background:var(--gold); color:#2a2213; }
+  .cat-pembelajaran .meta{ color:#3a2f18; opacity:1;}
+  .cat-penelitian{ background:var(--rust); }
+  .cat-ujian{ background:var(--slate); }
+
+  .empty-cell{
+    color:#c9c3ab;
+    font-size:12px;
+  }
+
+  /* ---- Course list ---- */
+  .list-title{
+    font-family:'Lora', serif;
+    font-size:19px;
+    font-weight:700;
+    color:var(--pine);
+    margin:38px 0 12px;
+  }
+
+  table.course-table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card-white);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+    font-size:13.5px;
+  }
+
+  table.course-table th{
+    background:var(--pine-soft);
+    color:#F3EEE2;
+    text-align:left;
+    padding:10px 12px;
+    font-weight:600;
+    font-size:12px;
+  }
+
+  table.course-table td{
+    padding:10px 12px;
+    border-top:1px solid var(--line);
+  }
+
+  table.course-table tr:nth-child(even) td{
+    background:#FBF7EE;
+  }
+
+  .dot{
+    display:inline-block;
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    margin-right:7px;
+  }
+
+  footer{
+    margin-top:36px;
+    font-size:12px;
+    color:#918d78;
+    text-align:center;
+  }
+
+  @media (max-width:640px){
+    table.course-table{ font-size:12px; }
+    table.course-table th, table.course-table td{ padding:8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="title-block">
+      <h1>Jadwal Kuliah</h1>
+      <p>Pendidikan Bahasa Arab &nbsp;·&nbsp; Periode 2026 Gasal &nbsp;·&nbsp; Semester 5</p>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><span class="num">24</span><span class="lbl">Total SKS</span></div>
+      <div class="stat"><span class="num">3.87</span><span class="lbl">IP K Lulus</span></div>
+    </div>
+  </header>
+
+  <div class="legend">
+    <span><i class="swatch" style="background:var(--pine)"></i>Bahasa Arab Inti</span>
+    <span><i class="swatch" style="background:var(--gold)"></i>Pembelajaran &amp; Teknologi</span>
+    <span><i class="swatch" style="background:var(--rust)"></i>Penelitian</span>
+    <span><i class="swatch" style="background:var(--slate)"></i>Ujian &amp; Praktik Mengajar</span>
+  </div>
+
+  <div class="table-scroll">
+    <table class="timetable">
+      <thead>
+        <tr>
+          <th>Jam</th>
+          <th>Senin</th>
+          <th>Selasa</th>
+          <th>Rabu</th>
+          <th>Kamis</th>
+          <th>Jumat</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>07:00<br>08:40</td>
+          <td>
+            <div class="slot cat-inti">
+              <span class="mk">Kitabah 2; Akadimiyah</span>
+              <span class="meta">M-202</span>
+            </div>
+          </td>
+          <td><span class="empty-cell">—</span></td>
+          <td>
+            <div class="slot cat-pembelajaran">
+              <span class="mk">Digitalisasi Pembelajaran B.A</span>
+              <span class="meta">M-203</span>
+            </div>
+          </td>
+          <td><span class="empty-cell">—</span></td>
+          <td><span class="empty-cell">—</span></td>
+        </tr>
+        <tr>
+          <td>08:40<br>10:20</td>
+          <td>
+            <div class="slot cat-inti">
+              <span class="mk">Tarjamah Fauriyah</span>
+              <span class="meta">M-303</span>
+            </div>
+          </td>
+          <td><span class="empty-cell">—</span></td>
+          <td><span class="empty-cell">—</span></td>
+          <td><span class="empty-cell">—</span></td>
+          <td><span class="empty-cell">—</span></td>
+        </tr>
+        <tr>
+          <td>10:20<br>12:00</td>
+          <td>
+            <div class="slot cat-penelitian">
+              <span class="mk">Metodologi Penelitian Kuantitatif</span>
+              <span class="meta">M-203</span>
+            </div>
+          </td>
+          <td>
+            <div class="slot cat-inti">
+              <span class="mk">Balaghah</span>
+              <span class="meta">M-303</span>
+            </div>
+          </td>
+          <td>
+            <div class="slot cat-ujian">
+              <span class="mk">TOAFL</span>
+              <span class="meta">M-306</span>
+            </div>
+          </td>
+          <td>
+            <div class="slot cat-inti">
+              <span class="mk">Balaghah</span>
+              <span class="meta">M-303</span>
+            </div>
+          </td>
+          <td><span class="empty-cell">—</span></td>
+        </tr>
+        <tr>
+          <td>12:00<br>13:00</td>
+          <td colspan="5" style="color:#c9c3ab; font-size:12px;">Istirahat</td>
+        </tr>
+        <tr>
+          <td>13:00<br>14:40</td>
+          <td>
+            <div class="slot cat-inti">
+              <span class="mk">Tarjamah</span>
+              <span class="meta">M-302</span>
+            </div>
+          </td>
+          <td>
+            <div class="slot cat-inti">
+              <span class="mk">Masrahiyah</span>
+              <span class="meta">M-203</span>
+            </div>
+          </td>
+          <td>
+            <div class="slot cat-pembelajaran">
+              <span class="mk">e-Learning</span>
+              <span class="meta">M-303</span>
+            </div>
+          </td>
+          <td><span class="empty-cell">—</span></td>
+          <td>
+            <div class="slot cat-ujian">
+              <span class="mk">Micro Teaching</span>
+              <span class="meta">Micro-3</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>14:40<br>16:20</td>
+          <td><span class="empty-cell">—</span></td>
+          <td><span class="empty-cell">—</span></td>
+          <td>
+            <div class="slot cat-pembelajaran">
+              <span class="mk">Metode &amp; Strategi Pemb. B.A 2</span>
+              <span class="meta">M-203</span>
+            </div>
+          </td>
+          <td><span class="empty-cell">—</span></td>
+          <td><span class="empty-cell">—</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="list-title">Daftar Mata Kuliah</h2>
+  <table class="course-table">
+    <thead>
+      <tr>
+        <th>Kode</th>
+        <th>Mata Kuliah</th>
+        <th>Kelas</th>
+        <th>SKS</th>
+        <th>Jadwal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>PBA5.020</td><td><span class="dot" style="background:var(--rust)"></span>Metodologi Penelitian Kuantitatif</td><td>A</td><td>2</td><td>Senin, 10:20–12:00 @ M-203</td></tr>
+      <tr><td>PBA5.021</td><td><span class="dot" style="background:var(--gold)"></span>Digitalisasi Pembelajaran Bahasa Arab</td><td>C</td><td>2</td><td>Rabu, 07:00–08:40 @ M-203</td></tr>
+      <tr><td>PBA5.022</td><td><span class="dot" style="background:var(--pine)"></span>Balaghah</td><td>A</td><td>4</td><td>Selasa &amp; Kamis, 10:20–12:00 @ M-303</td></tr>
+      <tr><td>PBA5.023</td><td><span class="dot" style="background:var(--pine)"></span>Tarjamah</td><td>C</td><td>2</td><td>Senin, 13:00–14:40 @ M-302</td></tr>
+      <tr><td>PBA5.024</td><td><span class="dot" style="background:var(--slate)"></span>TOAFL</td><td>A</td><td>2</td><td>Rabu, 10:20–12:00 @ M-306</td></tr>
+      <tr><td>PBA5.025</td><td><span class="dot" style="background:var(--pine)"></span>Masrahiyah</td><td>A</td><td>2</td><td>Selasa, 13:00–14:40 @ M-203</td></tr>
+      <tr><td>PBA5.026</td><td><span class="dot" style="background:var(--gold)"></span>Metode dan Strategi Pembelajaran Bahasa Arab 2</td><td>A</td><td>2</td><td>Rabu, 14:40–16:20 @ M-203</td></tr>
+      <tr><td>PBA5.027</td><td><span class="dot" style="background:var(--gold)"></span>e-Learning</td><td>A</td><td>2</td><td>Rabu, 13:00–14:40 @ M-303</td></tr>
+      <tr><td>PBA5.028</td><td><span class="dot" style="background:var(--pine)"></span>Kitabah 2; Akadimiyah</td><td>A</td><td>2</td><td>Senin, 07:00–08:40 @ M-202</td></tr>
+      <tr><td>PBA7.040</td><td><span class="dot" style="background:var(--pine)"></span>Tarjamah Fauriyah</td><td>A</td><td>2</td><td>Senin, 08:40–10:20 @ M-303</td></tr>
+      <tr><td>TAR0004</td><td><span class="dot" style="background:var(--slate)"></span>Micro Teaching</td><td>E</td><td>2</td><td>Jumat, 13:00–14:40 @ Micro-3</td></tr>
+    </tbody>
+  </table>
+
+  <footer>KRS telah divalidasi · Total 24 SKS · Batas SKS 24</footer>
+</div>
+</body>
+  </html>
+                                          
